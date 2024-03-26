@@ -1,14 +1,16 @@
 package com.in28minutes.springboot.myfirstwebapp.todo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
+    @Autowired
+    private TodoRepository todoRepository;
     private static final List<Todo> todos = new ArrayList<>();
     private static int todoCount = 0;
     static {
@@ -21,29 +23,22 @@ public class TodoService {
     }
 
     public List<Todo> findByUser(String username){
-        return todos.stream()
-                .filter(todo -> todo.getUsername().equalsIgnoreCase(username))
-                .collect(Collectors.toList());
+        return todoRepository.findByUsername(username);
     }
 
-    public void addTodo(String username, String description, LocalDate targetDate, boolean isDone){
-        Todo todo = new Todo(++todoCount, username, description, targetDate, isDone);
-        todos.add(todo);
+    public void addTodo(Todo todo){
+        todoRepository.save(todo);
     }
 
     public void deleteById(int id) {
-        todos.removeIf(todo -> todo.getId() == id);
+        todoRepository.deleteById(id);
     }
 
     public Todo findById(int id) {
-        return todos.stream()
-                .filter(todo -> todo.getId() == id)
-                .findFirst()
-                .get();
+        return todoRepository.findById(id).get();
     }
 
     public void updateTodo(Todo todo) {
-        Todo updateTodo = findById(todo.getId());
-        updateTodo.setDescription(todo.getDescription());
+        todoRepository.save(todo);
     }
 }
