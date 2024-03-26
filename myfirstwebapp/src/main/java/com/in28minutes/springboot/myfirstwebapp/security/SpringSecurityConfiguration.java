@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -36,10 +38,12 @@ public class SpringSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(
+                auth -> auth.anyRequest().authenticated());
         httpSecurity.formLogin(withDefaults());
-        httpSecurity.csrf().disable();
-        httpSecurity.headers().frameOptions().disable();
+
+        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         return  httpSecurity.build();
     }
 }
